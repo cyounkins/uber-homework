@@ -116,26 +116,28 @@ function load_csv(url:string): Promise<void> {
       }
 
       let numberProcessed = 0;
-      let recordBuffer = new Array<Object>;
+      let recordBuffer = new Array<Object>();
+      let inserts_in_flight = 0;
+      const max_inserts_in_flight = 100;
       let old_heap;
 
       function mainHandler() {
         let record;
 
-        while (record = parser.read()) {
+        while ((inserts_in_flight <= max_inserts_in_flight) && (record = parser.read())) {
           // console.log(record);
           recordBuffer.push(record);
           numberProcessed += 1;
 
           if (numberProcessed % 1000 == 0) {
-            if (old_heap != undefined) {
-              let diff = old_heap.end();
-              // console.log(diff);
-              // for (let i = 0; i < diff.change.details.length; i++) {
-              //   console.log(diff.change.details[i]);
-              // }
-            }
-            old_heap = new memwatch.HeapDiff();
+            // if (old_heap != undefined) {
+            //   let diff = old_heap.end();
+            //   console.log(diff);
+            //   for (let i = 0; i < diff.change.details.length; i++) {
+            //     console.log(diff.change.details[i]);
+            //   }
+            // }
+            // old_heap = new memwatch.HeapDiff();
 
             console.log(process.memoryUsage());
             console.log(numberProcessed);
@@ -147,12 +149,19 @@ function load_csv(url:string): Promise<void> {
 
             // Don't make routes that are from point A to A
             if (record_start[2] != record_end[2] || record_start[1] != record_end[1]) {
+              inserts_in_flight += 1;
+
               r.table('trips').insert({
                 date: new Date(Date.parse(record_start[0])),
                 path: r.line([parseFloat(record_start[2]), parseFloat(record_start[1])],
                              [parseFloat(record_end[2]), parseFloat(record_end[1])]),
                 base: record_start[3]
-              }).run(conn, {durability: "soft"});
+              }).run(conn, {durability: "soft"})
+              .then(function() {
+                inserts_in_flight -= 1;
+
+                parser.emit('readable');
+              })
             }
           }
         }
