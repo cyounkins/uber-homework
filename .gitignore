@@ -7,3 +7,5 @@ Desktop.ini
 node_modules
 npm-debug.log
 sublime.sublime-workspace
+backend/typings/
+backend/build/
