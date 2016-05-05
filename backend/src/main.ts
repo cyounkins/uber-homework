@@ -64,8 +64,8 @@ function query_to_linestring(points) {
 
   var linestring = "LINESTRING(";
   for (var i = 0; i < points.length; i++) {
-    linestring += (points[i][0] +
-      ' ' + points[i][1] + ',');
+    linestring += (points[i][0] + // lon
+      ' ' + points[i][1] + ',');  // lat
   }
 
   linestring += points[0][0] + ' ' + points[0][1] + ')';
@@ -88,17 +88,32 @@ router.get('/containedTrips', function *(next) {
   })
 });
 
-router.get('/commonStart', function *(next) {
+router.get('/top_pickups', function *(next) {
   var linestring = query_to_linestring(this.request.query.points);
+  var that = this;
 
-  db.many("SELECT ST_AsGeoJSON(start_point), count(*) as count FROM trips WHERE ST_Within (start_point, ST_Polygon(ST_GeomFromText($1), 4326)) GROUP BY start_point ORDER BY count DESC LIMIT $2", 
+  yield db.many("SELECT ST_AsGeoJSON(start_point), count(*) as count FROM trips WHERE ST_Within (start_point, ST_Polygon(ST_GeomFromText($1), 4326)) GROUP BY start_point ORDER BY count DESC LIMIT $2", 
     [linestring, this.request.query.limit || 10])
   .then(function(data) {
-    console.log(data);
+    var obj = {status: 'ok', points: []};
+    for (var i = 0; i < data.length; i++) {
+      obj.points.push({
+        type: 'Feature',
+        geometry: JSON.parse(data[i].st_asgeojson),
+        properties: {
+          count: data[i].count
+        }
+      });
+    }
+
+    that.response.body = JSON.stringify(obj);
   })
   .catch(function (error) {
-      console.log("SELECT statement threw error");
-      console.log(error);
+    // no rows
+    that.response.body = JSON.stringify({
+      status: 'ok',
+      points: []
+    });
   })
 });
 
