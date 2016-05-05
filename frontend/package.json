@@ -1,0 +1,27 @@
+{
+  "name": "uber-full-stack-developer-homework-frontend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/app.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Craig Younkins",
+  "license": "BSD-2-Clause",
+  "devDependencies": {
+    "css-loader": "^0.23.1",
+    "ts-loader": "^0.8.2",
+    "typescript": "^1.8.10",
+    "typings": "^0.8.1",
+    "webpack": "^1.13.0"
+  },
+  "dependencies": {
+    "leaflet": "^0.7.7",
+    "leaflet-draw": "^0.3.0",
+    "leaflet-geodesy": "^0.2.1",
+    "lodash": "^4.11.1",
+    "mapbox": "^1.0.0-beta",
+    "mapbox.js": "^2.4.0",
+    "react": "^15.0.2"
+  }
+}

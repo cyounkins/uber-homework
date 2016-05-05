@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset=utf-8 />
+<title>Show drawn polygon area</title>
+<meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+<!-- <script src='https://api.mapbox.com/mapbox.js/v2.4.0/mapbox.js'></script> -->
+<link href='https://api.mapbox.com/mapbox.js/v2.4.0/mapbox.css' rel='stylesheet' />
+<style>
+  body { margin:0; padding:0; }
+  #map { position:absolute; top:0; bottom:0; width:100%; }
+</style>
+</head>
+<body>
+
+
+<link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-draw/v0.2.3/leaflet.draw.css' rel='stylesheet' />
+<div id='map'></div>
+
+<!-- <script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-draw/v0.2.3/leaflet.draw.js'></script>
+<script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-geodesy/v0.1.0/leaflet-geodesy.js'></script>
+<script src="//cdn.jsdelivr.net/mithril/0.2.4/mithril.min.js"></script> -->
+<!-- <script src="/static/polyline.js"></script> -->
+<script src="/static/bundle.js"></script>
+
+<script>
+// L.mapbox.accessToken = 'pk.eyJ1IjoiY3lvdW5raW5zIiwiYSI6ImNpbnFtcGo5bTEwYTd0cWtqZjJnaGdheGcifQ.IoUfEsKhYimOdVDK3ORcOQ';
+// var map = L.mapbox.map('map', 'mapbox.streets');
+
+// var drawnElements = L.featureGroup().addTo(map);
+// var topPickupsGroup = L.featureGroup().addTo(map);
+
+// var drawControl = new L.Control.Draw({
+//   edit: {
+//     featureGroup: drawnElements
+//   },
+//   draw: {
+//     polygon: true,
+//     polyline: false,
+//     rectangle: false,
+//     circle: false,
+//     marker: false
+//   }
+// }).addTo(map);
+
+// map.on('draw:created', showTopPickups);
+// map.on('draw:edited', showTopPickupsEdited);
+
+// function showTopPickupsEdited(e) {
+//   e.layers.eachLayer(function(layer) {
+//     showTopPickups({ layer: layer });
+//   });
+// }
+
+// function showTopPickups(e) {
+//   drawnElements.clearLayers();
+//   drawnElements.addLayer(e.layer);
+
+//   var qs = '';
+//   var points = e.layer.getLatLngs();
+//   for (var i = 0; i < points.length; i++) {
+//     qs += 'points=' + points[i].lng + ',' + points[i].lat + '&';
+//   }
+
+//   // Remove the trailing '&'
+//   qs = qs.substr(0, qs.length-1)
+
+//   var url = '/api/top_pickups?' + qs;
+//   m.request({method: "GET", url: url}).then(function(response) {
+//     topPickupsGroup.clearLayers();
+//     topPickupsGroup.addLayer(L.geoJson(response.points));
+//   });
+// }
+
+// map.on('load', function() {
+//   m.request({method: "GET", url: "/api/all_trips"}).then(function(response) {
+//     var trips = m.prop([])(response);
+//     var trip_markers = [];
+//     var trip_paths = [];
+
+//     trips.map(function(trip) {
+//       trip_markers.push({
+//         type: 'Feature',
+//         geometry: trip.start_point,
+//         properties: {
+//           'marker-color': '#50E65A'
+//         }
+//       });
+
+//       trip_markers.push({
+//         type: 'Feature',
+//         geometry: trip.end_point,
+//         properties: {
+//           'marker-color': '#E66778'
+//         }
+//       });     
+//     })
+
+//     trips.map(function(trip) {
+//       trip_paths.push(polyline.decode(trip.path_polyline, 6));
+//     })
+
+//     L.mapbox.featureLayer(trip_markers).addTo(map);
+//     var mpl = L.multiPolyline(trip_paths, {color: 'red'});
+//     mpl.addTo(map);
+//     map.fitBounds(mpl.getBounds());
+
+//   });
+// });
+
+// map.setView([40.78885994449482, -73.88374328613281], 12);
+
+</script>
+
+</body>
+</html>

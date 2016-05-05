@@ -9,3 +9,5 @@ npm-debug.log
 sublime.sublime-workspace
 backend/typings/
 backend/build/
+frontend/typings/
+frontend/build/
