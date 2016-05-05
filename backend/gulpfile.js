@@ -8,8 +8,8 @@ var tsProject = ts.createProject('tsconfig.json', {
  
 gulp.task('scripts', function() {
   var tsResult = gulp.src(['src/**/*.ts', 'typings/main/**/*.d.ts', 'typings_custom/**/*.d.ts'])
-          .pipe(sourcemaps.init())
-          .pipe(ts(tsProject));
+    .pipe(sourcemaps.init())
+    .pipe(ts(tsProject));
  
   return tsResult.js
     .pipe(sourcemaps.write()) // Now the sourcemaps are added to the .js file 
