@@ -86,9 +86,7 @@ function load_csv(url:string): Promise<void> {
         url = "https://api.mapbox.com/v4/directions/mapbox.driving/" + obj.start_lng + ',' + obj.start_lat + 
           ';' + obj.end_lng + ',' + obj.end_lat + '.json' + '?access_token=pk.eyJ1IjoiY3lvdW5raW5zIiwiYSI6ImNpbnFtcGo5bTEwYTd0cWtqZjJnaGdheGcifQ.IoUfEsKhYimOdVDK3ORcOQ' +
           '&steps=false&geometry=polyline';
-
-        console.log(url);
-
+          
         got
         .get(url, {json: true})
         .then(function(response) {
@@ -104,7 +102,9 @@ function load_csv(url:string): Promise<void> {
     function insert(obj) {
       return highland(new Promise<any>(function(resolve, reject) {
         total_processed += 1;
-        console.log(total_processed);
+        if (total_processed % 100 == 0) {
+          console.log(total_processed);
+        }
 
         db.none("INSERT INTO trips(start_time, start_point, end_time, end_point, duration_sec, path_polyline) VALUES($1, ST_SetSRID(ST_Point($2, $3),4326), $4, ST_SetSRID(ST_Point($5, $6),4326), $7, $8)", 
           [obj.start_time, obj.start_lng, obj.start_lat, obj.end_time, obj.end_lng, obj.end_lat, obj.duration_sec, obj.path])
