@@ -127,9 +127,8 @@ function load_csv(url:string): Promise<void> {
     .drop(1)  // drop the header
     .batch(2) // 2 records at a time
     .filter(points_not_same) // make sure the start and end are not the same
-    .take(2000)
     .map(convert_pair_to_object)
-    .ratelimit(2000, 1000)
+    .ratelimit(50, 100)
     .flatMap(add_directions)
     .flatMap(insert)
     .done(function() {
@@ -148,10 +147,10 @@ function series(methods) {
 
 let foo = [
   load_csv.bind(undefined, 'https://github.com/fivethirtyeight/uber-tlc-foil-response/raw/master/uber-trip-data/uber-raw-data-apr14.csv'),
-  // load_csv.bind(undefined, 'https://github.com/fivethirtyeight/uber-tlc-foil-response/raw/master/uber-trip-data/uber-raw-data-may14.csv'),
-  // load_csv.bind(undefined, 'https://github.com/fivethirtyeight/uber-tlc-foil-response/raw/master/uber-trip-data/uber-raw-data-jun14.csv'),
-  // load_csv.bind(undefined, 'https://github.com/fivethirtyeight/uber-tlc-foil-response/raw/master/uber-trip-data/uber-raw-data-jul14.csv'),
-  // load_csv.bind(undefined, 'https://github.com/fivethirtyeight/uber-tlc-foil-response/raw/master/uber-trip-data/uber-raw-data-aug14.csv')
+  load_csv.bind(undefined, 'https://github.com/fivethirtyeight/uber-tlc-foil-response/raw/master/uber-trip-data/uber-raw-data-may14.csv'),
+  load_csv.bind(undefined, 'https://github.com/fivethirtyeight/uber-tlc-foil-response/raw/master/uber-trip-data/uber-raw-data-jun14.csv'),
+  load_csv.bind(undefined, 'https://github.com/fivethirtyeight/uber-tlc-foil-response/raw/master/uber-trip-data/uber-raw-data-jul14.csv'),
+  load_csv.bind(undefined, 'https://github.com/fivethirtyeight/uber-tlc-foil-response/raw/master/uber-trip-data/uber-raw-data-aug14.csv')
 ];
 
 reset_database()
