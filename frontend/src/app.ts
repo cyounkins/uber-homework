@@ -1,4 +1,3 @@
-// import L = require('leaflet');
 var mapboximport = require('mapbox.js');
 import m = require('mithril');
 var leaflet_draw = require('leaflet-draw');

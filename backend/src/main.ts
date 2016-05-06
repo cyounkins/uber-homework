@@ -74,20 +74,6 @@ function query_to_linestring(points) {
 }
 
 
-router.get('/containedTrips', function *(next) {
-  var linestring = query_to_linestring(this.request.query.points);
-
-  db.many("SELECT start_point, count(*) as count FROM trips WHERE ST_Within (start_point, ST_Polygon(ST_GeomFromText($1), 4326)) AND ST_Within (end_point, ST_Polygon(ST_GeomFromText($1), 4326)) GROUP BY start_point ORDER BY count DESC LIMIT $2", 
-    [linestring, this.request.query.limit || 10])
-  .then(function(data) {
-    console.log(data);
-  })
-  .catch(function (error) {
-      console.log("SELECT statement threw error");
-      console.log(error);
-  })
-});
-
 router.get('/top_pickups', function *(next) {
   var linestring = query_to_linestring(this.request.query.points);
   var that = this;
