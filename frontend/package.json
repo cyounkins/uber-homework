@@ -16,12 +16,14 @@
     "webpack": "^1.13.0"
   },
   "dependencies": {
+    "json-loader": "^0.5.4",
     "leaflet": "^0.7.7",
     "leaflet-draw": "^0.3.0",
     "leaflet-geodesy": "^0.2.1",
     "lodash": "^4.11.1",
     "mapbox": "^1.0.0-beta",
     "mapbox.js": "^2.4.0",
+    "mithril": "^0.2.4",
     "react": "^15.0.2"
   }
 }
