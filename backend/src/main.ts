@@ -18,6 +18,7 @@ var db = pgp({
 
 const app = new koa();
 const router = new koa_router();
+const redirect_router = new koa_router();
 
 // x-response-time
 
@@ -38,6 +39,11 @@ app.use(function *(next){
   console.log('%s %s - %s', this.method, this.url, ms);
 });
 
+// Redirect
+
+redirect_router.redirect('/', '/static/main.html');
+app.use(redirect_router.routes());
+app.use(redirect_router.allowedMethods());
 
 // static
 
