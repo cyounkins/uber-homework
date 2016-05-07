@@ -13,26 +13,14 @@ var db = pgp({
   password: 'moo'
 });
 
-function reset_database(): Promise<void> {
-  return new Promise<void>(function(resolve, reject) {
-    db.none("DROP TABLE IF EXISTS trips")
-    .catch(function (error) {
-        console.log("DROP TABLE statement threw error");
-        console.log(error);
-    })
-    .then(function () {
-        return db.none("CREATE TABLE trips (id SERIAL PRIMARY KEY, start_time timestamp, start_point geometry(POINT,4326), end_time timestamp, end_point geometry(POINT,4326), duration_sec int4, path_polyline text)");
-    })
-    .catch(function (error) {
-        console.log("CREATE TABLE statement threw error");
-        console.log(error);
-    })
-    .then(function () {
-        resolve();
+function reset_database():Promise<void> {
+    return db.tx(function (t) {
+        return t.batch([
+            t.none("DROP TABLE IF EXISTS trips"),
+            t.none("CREATE TABLE trips (id SERIAL PRIMARY KEY, start_time timestamp, start_point geometry(POINT,4326), end_time timestamp, end_point geometry(POINT,4326), duration_sec int4, path_polyline text)")
+        ]);
     });
-  });
 }
-
 
 function load_csv(url:string): Promise<void> {
   return new Promise<void>(function(resolve, reject) {
