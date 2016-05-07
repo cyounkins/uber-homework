@@ -13,26 +13,22 @@ var db = pgp({
   password: 'moo'
 });
 
-function reset_database(): Promise<void> {
-  return new Promise<void>(function(resolve, reject) {
-    db.none("DROP TABLE IF EXISTS trips")
-    .catch(function (error) {
-        console.log("DROP TABLE statement threw error");
-        console.log(error);
-    })
-    .then(function () {
-        return db.none("CREATE TABLE trips (id SERIAL PRIMARY KEY, start_time timestamp, start_point geometry(POINT,4326), end_time timestamp, end_point geometry(POINT,4326), duration_sec int4, path_polyline text)");
-    })
-    .catch(function (error) {
-        console.log("CREATE TABLE statement threw error");
-        console.log(error);
-    })
-    .then(function () {
-        resolve();
-    });
-  });
+// Helper for linking to external query files: 
+function sql(file) {
+    return new pgp.QueryFile(file, {minify: true});
 }
 
+var sql_drop = sql('./sql/drop.sql');
+var sql_create = sql('./sql/create.sql');
+
+function reset_database():Promise<void> {
+  return db.tx(function (t) {
+    return t.batch([
+      t.none(sql_drop),
+      t.none(sql_create)
+    ]);
+  });
+}
 
 function load_csv(url:string): Promise<void> {
   return new Promise<void>(function(resolve, reject) {
@@ -86,7 +82,7 @@ function load_csv(url:string): Promise<void> {
         url = "https://api.mapbox.com/v4/directions/mapbox.driving/" + obj.start_lng + ',' + obj.start_lat + 
           ';' + obj.end_lng + ',' + obj.end_lat + '.json' + '?access_token=pk.eyJ1IjoiY3lvdW5raW5zIiwiYSI6ImNpbnFtcGo5bTEwYTd0cWtqZjJnaGdheGcifQ.IoUfEsKhYimOdVDK3ORcOQ' +
           '&steps=false&geometry=polyline';
-          
+
         got
         .get(url, {json: true})
         .then(function(response) {
