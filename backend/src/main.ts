@@ -82,12 +82,12 @@ function query_to_linestring(points) {
 
 router.get('/top_pickups', function *(next) {
   var linestring = query_to_linestring(this.request.query.points);
-  var that = this;
 
-  yield db.many("SELECT ST_AsGeoJSON(start_point), count(*) as count FROM trips WHERE ST_Within (start_point, ST_Polygon(ST_GeomFromText($1), 4326)) GROUP BY start_point ORDER BY count DESC LIMIT $2", 
-    [linestring, this.request.query.limit || 10])
-  .then(function(data) {
+  try {
+    var data = yield db.many("SELECT ST_AsGeoJSON(start_point), count(*) as count FROM trips WHERE ST_Within (start_point, ST_Polygon(ST_GeomFromText($1), 4326)) GROUP BY start_point ORDER BY count DESC LIMIT $2", 
+      [linestring, this.request.query.limit || 10]);
     var obj = {status: 'ok', points: []};
+
     for (var i = 0; i < data.length; i++) {
       obj.points.push({
         type: 'Feature',
@@ -96,56 +96,58 @@ router.get('/top_pickups', function *(next) {
           count: data[i].count
         }
       });
-    }
 
-    that.response.body = JSON.stringify(obj);
-  })
-  .catch(function (error) {
+      this.response.body = JSON.stringify(obj);
+    }
+  }
+  catch (err) {
     // no rows
-    that.response.body = JSON.stringify({
+    this.response.body = JSON.stringify({
       status: 'ok',
       points: []
     });
-  })
+  }
 });
 
 
 router.get('/trips_in_polygon', function *(next) {
   var linestring = query_to_linestring(this.request.query.points);
-  var that = this;
 
-  yield db.many("SELECT id, ST_AsGeoJSON(start_point) as start_point, ST_AsGeoJSON(end_point) as end_point, path_polyline FROM trips WHERE ST_Within (start_point, ST_Polygon(ST_GeomFromText($1), 4326)) AND ST_Within (end_point, ST_Polygon(ST_GeomFromText($1), 4326))", 
-    [linestring])
-  .then(function(data) {
-    data = data.map(function(row) {
+  try {
+    var data = db.many("SELECT id, ST_AsGeoJSON(start_point) as start_point, ST_AsGeoJSON(end_point) as end_point, path_polyline FROM trips WHERE ST_Within (start_point, ST_Polygon(ST_GeomFromText($1), 4326)) AND ST_Within (end_point, ST_Polygon(ST_GeomFromText($1), 4326))", 
+      [linestring]);
+
+    var data = data.map(function(row) {
       row.start_point = JSON.parse(row.start_point);
       row.end_point = JSON.parse(row.end_point);
       return row;
-    })
-    that.response.body = JSON.stringify(data);
-  })
-  .catch(function (error) {
-      console.log("SELECT statement threw error");
-      console.log(error);
-  })
+    });
+
+    this.response.body = JSON.stringify(data);
+  }
+  catch (err) {
+    console.log("SELECT statement threw error");
+    console.log(err);
+  }
 });
 
-router.get('/all_trips', function *(next) {
-  var that = this;
 
-  yield db.many("SELECT id, ST_AsGeoJSON(start_point) as start_point, ST_AsGeoJSON(end_point) as end_point, path_polyline FROM trips")
-  .then(function(data) {
+router.get('/all_trips', function *(next) {
+  try {
+    var data = yield db.many("SELECT id, ST_AsGeoJSON(start_point) as start_point, ST_AsGeoJSON(end_point) as end_point, path_polyline FROM trips")
+    
     data = data.map(function(row) {
       row.start_point = JSON.parse(row.start_point);
       row.end_point = JSON.parse(row.end_point);
       return row;
-    })
-    that.response.body = JSON.stringify(data);
-  })
-  .catch(function (error) {
-      console.log("SELECT statement threw error");
-      console.log(error);
-  })
+    });
+
+    this.response.body = JSON.stringify(data);
+  }
+  catch (err) {
+    console.log("SELECT statement threw error");
+    console.log(err);
+  }
 });
 
 app
