@@ -44,7 +44,7 @@ The JavaScript ecosystem changes preferences faster than a teenager.
 Problems
 --------
 
-Ubuntu VM would sometimes consume all CPU it could and lock up. No response via SSH. Did not pursue.
+Ubuntu VM would sometimes consume all CPU it could and lock up. No response via SSH or HTTP. Did not pursue. Possibly Virtualbox issue?
 
 OSM dataset has incomplete speed limits.
 
@@ -53,3 +53,17 @@ Future work
 -----------
 
 To show a heatmap of the pickup locations or the routes, some pre-processing must be done on the server. There is too much data for either frontend or backend to process quickly enough for the system to be responsive. I thought about bucketing the points, and found [a nice article](http://www.sebastianmeier.eu/2014/06/01/heattile-a-new-method-for-heatmap-implementations-for-mobile-web-based-cartographic-applications/) describing exactly what I was thinking.
+
+Add ability to control query LIMIT.
+
+Show end markers of routes on hover.
+
+Add filters for time of day.
+
+Type interfaces for JSON structures going over HTTP.
+
+Move SQL queries in main.ts out into separate files.
+
+Abstract interface to data instead of forced through HTTP.
+
+After abstract interface, unit testing.
