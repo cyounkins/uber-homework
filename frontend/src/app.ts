@@ -2,12 +2,31 @@ var mapboximport = require('mapbox.js');
 import m = require('mithril');
 var leaflet_draw = require('leaflet-draw');
 var leaflet_geodesy = require('leaflet-geodesy');
+import polyline = require('polyline');
+
 
 L.mapbox.accessToken = 'pk.eyJ1IjoiY3lvdW5raW5zIiwiYSI6ImNpbnFtcGo5bTEwYTd0cWtqZjJnaGdheGcifQ.IoUfEsKhYimOdVDK3ORcOQ';
 var map = L.mapbox.map('map', 'mapbox.streets');
 
 var drawnElements = L.featureGroup().addTo(map);
-var topPickupsGroup = L.featureGroup().addTo(map);
+var topPickupsLayer = L.mapbox.featureLayer().addTo(map);
+var tripsLayer = L.multiPolyline(new Array<any>(), {color: 'red'}).addTo(map);
+
+topPickupsLayer.on('mouseover', function(e) {
+  var url = '/api/trips_from_start?point=' + e.latlng.lng + ',' + e.latlng.lat;
+
+  m.request({method: "GET", url: url}).then(function(response) {
+    var paths = response.trips.map(function(trip) {
+      return polyline.decode(trip.path_polyline, 6);
+    });
+
+    tripsLayer.setLatLngs(paths);
+  });
+});
+
+topPickupsLayer.on('mouseout', function(e) {
+  tripsLayer.clearLayers();
+});
 
 var drawControl = new L.Control.Draw({
   edit: {
@@ -46,8 +65,13 @@ function showTopPickups(e) {
 
   var url = '/api/top_pickups?' + qs;
   m.request({method: "GET", url: url}).then(function(response) {
-    topPickupsGroup.clearLayers();
-    topPickupsGroup.addLayer(L.geoJson(response.points));
+    var points = response.points.map(function(point) {
+      point.properties['marker-symbol'] = point.rank.toString();
+      point.properties.description = point.count + ' ' + (point.count > 1 ? 'trips' : 'trip') + ' from here';
+      return point;
+    });
+
+    topPickupsLayer.setGeoJSON(points);
   });
 }
 
