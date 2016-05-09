@@ -13,6 +13,7 @@ var topPickupsLayer = L.mapbox.featureLayer().addTo(map);
 var tripsLayer = L.multiPolyline(new Array<any>(), {color: 'red'}).addTo(map);
 
 topPickupsLayer.on('mouseover', function(e) {
+  // TODO cache this or send the trip data down with top_pickups
   var url = '/api/trips_from_start?point=' + e.latlng.lng + ',' + e.latlng.lat;
 
   m.request({method: "GET", url: url}).then(function(response) {

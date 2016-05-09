@@ -111,6 +111,7 @@ router.get('/top_pickups', function *(next) {
   }
 });
 
+
 router.get('/trips_from_start', function *(next) {
   var lngLat = this.request.query.point.split(',');
 
@@ -138,50 +139,9 @@ router.get('/trips_from_start', function *(next) {
 });
 
 
-router.get('/trips_in_polygon', function *(next) {
-  var linestring = query_to_linestring(this.request.query.points);
-
-  try {
-    var data = db.many("SELECT id, ST_AsGeoJSON(start_point) as start_point, ST_AsGeoJSON(end_point) as end_point, path_polyline FROM trips WHERE ST_Within (start_point, ST_Polygon(ST_GeomFromText($1), 4326)) AND ST_Within (end_point, ST_Polygon(ST_GeomFromText($1), 4326))", 
-      [linestring]);
-
-    var data = data.map(function(row) {
-      row.start_point = JSON.parse(row.start_point);
-      row.end_point = JSON.parse(row.end_point);
-      return row;
-    });
-
-    this.response.body = JSON.stringify(data);
-  }
-  catch (err) {
-    console.log("SELECT statement threw error");
-    console.log(err);
-  }
-});
-
-
-router.get('/all_trips', function *(next) {
-  try {
-    var data = yield db.many("SELECT id, ST_AsGeoJSON(start_point) as start_point, ST_AsGeoJSON(end_point) as end_point, path_polyline FROM trips")
-    
-    data = data.map(function(row) {
-      row.start_point = JSON.parse(row.start_point);
-      row.end_point = JSON.parse(row.end_point);
-      return row;
-    });
-
-    this.response.body = JSON.stringify(data);
-  }
-  catch (err) {
-    console.log("SELECT statement threw error");
-    console.log(err);
-  }
-});
-
 app
   .use(mount('/api', router.routes()))
   .use(mount('/api', router.allowedMethods()));
-
 
 app.listen(3000);
 
